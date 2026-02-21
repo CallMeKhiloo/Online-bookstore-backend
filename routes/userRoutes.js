@@ -14,4 +14,14 @@ router.post('/signup', async (req, res, next) => {
   });
 });
 
+router.post('/login', async (req, res, next) => {
+  const [error, token] = await asyncWrapper(userController.login(req));
+
+  if (error) return next(error);
+  res.status(200).json({
+    status: 'successful',
+    token,
+  });
+});
+
 module.exports = router;

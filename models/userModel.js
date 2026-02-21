@@ -39,6 +39,21 @@ const userSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+// instance methods
+userSchema.methods.verifyPassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+
+userSchema.methods.generateJWT = function () {
+  return jwt.sign(
+    { userId: this._id, role: this.role }, // i sent the role in order to check instantly if a route is for an admin
+    process.env.JWT_SECRET,
+    {
+      expiresIn: process.env.JWT_EXPIRES_IN,
+    },
+  );
+};
+
 // document middlewares
 userSchema.pre('save', async function () {
   if (!this.isModified('password')) return next(); // don't hash if password hasn't changed

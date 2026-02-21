@@ -37,7 +37,7 @@ const bookSchema = mongoose.Schema({
     required: true,
     index: true
 },
-  catefory: {
+  category: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Category',
     required: true,

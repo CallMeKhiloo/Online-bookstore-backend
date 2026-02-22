@@ -5,12 +5,13 @@ const path = require('path');
 
 const router = require('./routes');
 
-dotenv.config(path.join(__dirname, '.env'));
+dotenv.config({ path: path.join(__dirname, '.env') });
+require('./config/cloudinary');
 
 const database = process.env.DATABASE_URI;
 mongoose
   .connect(database)
-  .then(console.log('CONNECTED TO THE DATABASE'))
+  .then(() => {console.log('CONNECTED TO THE DATABASE');})
   .catch((err) => {
     console.error(err.message);
     process.exit(1);

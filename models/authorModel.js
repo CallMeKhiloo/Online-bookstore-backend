@@ -13,6 +13,8 @@ const authorSchema = mongoose.Schema({
     // min: [5, 'maximum number of character is 5'],
     maxLength: [50, 'maximum number of character for bio is 50']    
   }
+}, {
+  timestamps: true
 });
 
 const Author = mongoose.model('Author', authorSchema);

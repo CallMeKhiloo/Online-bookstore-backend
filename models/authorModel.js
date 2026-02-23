@@ -11,7 +11,7 @@ const authorSchema = mongoose.Schema({
   bio: {
     type: String,
     // min: [5, 'maximum number of character is 5'],
-    maxLength: [50, 'maximum number of character for bio is 50']    
+    maxLength: [50, 'maximum number of character for bio is 50']
   }
 }, {
   timestamps: true

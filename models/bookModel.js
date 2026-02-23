@@ -23,7 +23,7 @@ const bookSchema = mongoose.Schema({
 },
   stock: {
     type: Number,
-    required: true,
+    // required: true,
     min: [1, 'Stock must be at least 1'],
     validate: {
         validator: Number.isInteger,

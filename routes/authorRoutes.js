@@ -4,13 +4,6 @@ const asyncWrapper = require('../helpers/asyncWrapper');
 const router = express.Router();
 const { protect, restrictTo } = require('../middlewares/auth');
 
-// Import Validation
-const validate = require('../middlewares/validation');
-const {
-  createAuthorSchema,
-  updateAuthorSchema,
-} = require('../validations/author.validation');
-
 /**
  * @swagger
  * tags:
@@ -42,6 +35,12 @@ const {
  *                     $ref: '#/components/schemas/Author'
  */
 
+const validate = require('../middlewares/validate');
+const {
+  createAuthorSchema,
+  updateAuthorSchema,
+} = require('../validations/author.validation');
+
 router.get('/', async (req, res, next) => {
   const [error, data] = await asyncWrapper(authorController.getAllAuthors(req));
   if (error) return next(error);
@@ -70,7 +69,7 @@ router.get('/', async (req, res, next) => {
  *       201:
  *         description: Author created
  *       500:
- *         description: Server error
+ *         description: Server errors
  */
 
 // Admin-restricted

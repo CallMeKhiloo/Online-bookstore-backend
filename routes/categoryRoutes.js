@@ -3,9 +3,7 @@ const { categoryController } = require('../controllers');
 const asyncWrapper = require('../helpers/asyncWrapper');
 const router = express.Router();
 const { protect, restrictTo } = require('../middlewares/auth');
-
-// Import Validation
-const validate = require('../middlewares/validation');
+const validate = require('../middlewares/validate');
 const {
   createCategorySchema,
   updateCategorySchema,

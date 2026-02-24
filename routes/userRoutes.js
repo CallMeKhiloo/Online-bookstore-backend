@@ -2,16 +2,12 @@ const express = require('express');
 const { userController } = require('../controllers');
 const asyncWrapper = require('../helpers/asyncWrapper');
 const { protect, restrictTo } = require('../middlewares/auth');
-
-// Import from auth.validation.js
+const validate = require('../middlewares/validate');
 const {
-  signupSchema,
-  loginValidation,
-  updateProfileSchema,
+  registerValidation,
+  loginSchema,
+  // to do updateProfileSchema
 } = require('../validations/auth.validation');
-
-// Import the generic validate middleware
-const validate = require('../middlewares/validation');
 
 const router = express.Router();
 
@@ -49,7 +45,7 @@ const router = express.Router();
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 
-router.post('/signup', validate(signupSchema), async (req, res, next) => {
+router.post('/signup', validate(registerValidation), async (req, res, next) => {
   const [error, user] = await asyncWrapper(userController.createUser(req));
 
   if (error) return next(error);
@@ -112,7 +108,7 @@ router.post('/login', validate(loginValidation), async (req, res, next) => {
 router.patch(
   '/profile',
   protect,
-  validate(updateProfileSchema),
+  // todo
   async (req, res, next) => {
     const [error, updatedUser] = await asyncWrapper(
       userController.updateMe(req),

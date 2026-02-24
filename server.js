@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
+const cors = require('cors');
 
 const router = require('./routes');
 
@@ -13,13 +14,21 @@ require('./config/cloudinary');
 const database = process.env.DATABASE_URI;
 mongoose
   .connect(database)
-  .then(() => {console.log('CONNECTED TO THE DATABASE');})
+  .then(() => {
+    console.log('CONNECTED TO THE DATABASE');
+  })
   .catch((err) => {
     console.error(err.message);
     process.exit(1);
   });
 
 const app = express();
+
+app.use(
+  cors({
+    origin: 'http://localhost:4200',
+  }),
+);
 
 //global middlewares
 app.use(express.static(path.join(__dirname, 'public'))); // to serve static files

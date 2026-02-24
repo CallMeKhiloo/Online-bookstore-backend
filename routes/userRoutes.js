@@ -37,7 +37,7 @@ const router = express.Router();
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.post('/signup', async (req, res, next) => {
+router.post('/signup', validate(signupSchema), async (req, res, next) => {
   const [error, user] = await asyncWrapper(userController.createUser(req));
 
   if (error) return next(error);
@@ -86,7 +86,7 @@ router.post('/signup', async (req, res, next) => {
  *               status: unsuccessful
  *               message: User name or password is not correct
  */
-router.post('/login', async (req, res, next) => {
+router.post('/login', validate(loginSchema), async (req, res, next) => {
   const [error, token] = await asyncWrapper(userController.login(req));
 
   if (error) return next(error);

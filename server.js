@@ -2,6 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const path = require('path');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swagger');
 
 const router = require('./routes');
 
@@ -23,6 +25,7 @@ const app = express();
 app.use(express.static(path.join(__dirname, 'public'))); // to serve static files
 app.use(express.json());
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(router);
 
 app.use((req, res) => {

@@ -18,7 +18,21 @@ const login = async (req) => {
   return user.generateJWT();
 };
 
+const updateMe = async (req) => {
+  const updatedUser = await Users.findByIdAndUpdate(
+    req.user._id,
+    req.body,
+    {
+      returnDocument: 'after', // to return the updated doc
+      runValidators: true,
+    },
+  );
+
+  return updatedUser;
+};
+
 module.exports = {
   createUser,
   login,
+  updateMe,
 };

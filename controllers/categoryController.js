@@ -35,7 +35,7 @@ const deleteCategory = async (req) => {
   const category = await Category.findById(req.params.id);
   if (!category) throw new Error('can not delete category: id is not valid');
 
-  const booksNo = await Book.countDocuments({categroy: req.params.id});
+  const booksNo = await Book.countDocuments({category: req.params.id});
   if (booksNo > 0) throw new Error('can not delete this category, it has books assigned to it');
 
   await Category.findByIdAndDelete(req.params.id);

@@ -47,7 +47,7 @@ userSchema.methods.verifyPassword = async function (enteredPassword) {
 userSchema.methods.generateJWT = function () {
   return jwt.sign(
     { userId: this._id, role: this.role }, // i sent the role in order to check instantly if a route is for an admin
-    process.env.JWT_SECRET,
+     process.env.JWT_SECRET,
     {
       expiresIn: process.env.JWT_EXPIRES_IN,
     },

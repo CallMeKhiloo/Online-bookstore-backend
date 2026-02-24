@@ -35,6 +35,7 @@ app.use((req, res) => {
   });
 });
 
+//global error middleware
 app.use((error, req, res, next) => {
   console.log(error.message);
   res.status(500).json({ status: 'unsuccessful', message: error.message });

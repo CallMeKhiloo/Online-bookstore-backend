@@ -1,9 +1,15 @@
 const express = require('express');
-const {categoryController} = require('../controllers');
+const { categoryController } = require('../controllers');
 const asyncWrapper = require('../helpers/asyncWrapper');
 const router = express.Router();
-const {protect, restrictTo} = require('../middlewares/auth');
+const { protect, restrictTo } = require('../middlewares/auth');
 
+// Import Validation
+const validate = require('../middlewares/validation');
+const {
+  createCategorySchema,
+  updateCategorySchema,
+} = require('../validations/category.validation');
 
 /**
  * @swagger
@@ -35,13 +41,16 @@ const {protect, restrictTo} = require('../middlewares/auth');
  *                   items:
  *                     $ref: '#/components/schemas/Category'
  */
+
 router.get('/', async (req, res, next) => {
-  const [error, data] = await asyncWrapper(categoryController.getAllCategories(req));
+  const [error, data] = await asyncWrapper(
+    categoryController.getAllCategories(req),
+  );
   if (error) return next(error);
   res.status(200).json({
     status: 'successful',
-    len : data.length,
-    data
+    len: data.length,
+    data,
   });
 });
 
@@ -67,15 +76,23 @@ router.get('/', async (req, res, next) => {
  */
 
 // admin-restricted
-router.post('/', protect, restrictTo('Admin'), async (req, res, next) => {
-  const [error, data] = await asyncWrapper(categoryController.createCategory(req));
-  if (error) return next(error);
-  res.status(201).json({
-    status: 'successful',
-    len : 1,
-    data
-  });
-});
+router.post(
+  '/',
+  protect,
+  restrictTo('Admin'),
+  validate(createCategorySchema),
+  async (req, res, next) => {
+    const [error, data] = await asyncWrapper(
+      categoryController.createCategory(req),
+    );
+    if (error) return next(error);
+    res.status(201).json({
+      status: 'successful',
+      len: 1,
+      data,
+    });
+  },
+);
 
 /**
  * @swagger
@@ -95,13 +112,14 @@ router.post('/', protect, restrictTo('Admin'), async (req, res, next) => {
  *       500:
  *         description: Not found or server error
  */
+
 router.get('/:id', async (req, res, next) => {
   const [error, data] = await asyncWrapper(categoryController.getCategory(req));
   if (error) return next(error);
   res.status(200).json({
     status: 'successful',
-    len : 1,
-    data
+    len: 1,
+    data,
   });
 });
 
@@ -137,13 +155,16 @@ router.get('/:id', async (req, res, next) => {
  *       500:
  *         description: Category not found or server error
  */
+
 router.get('/:id/books', async (req, res, next) => {
-  const [error, data] = await asyncWrapper(categoryController.getBooksByCategory(req));
+  const [error, data] = await asyncWrapper(
+    categoryController.getBooksByCategory(req),
+  );
   if (error) return next(error);
   res.status(200).json({
     status: 'successful',
-    len : data.length,
-    data
+    len: data.length,
+    data,
   });
 });
 
@@ -172,12 +193,21 @@ router.get('/:id/books', async (req, res, next) => {
  *       500:
  *         description: Server error
  */
+
 // admin-restricted
-router.patch('/:id', protect, restrictTo('Admin'), async (req, res, next) => {
-  const [error, data] = await asyncWrapper(categoryController.updateCategory(req));
-  if (error) return next(error);
-  res.status(204).send();
-});
+router.patch(
+  '/:id',
+  protect,
+  restrictTo('Admin'),
+  validate(updateCategorySchema),
+  async (req, res, next) => {
+    const [error, data] = await asyncWrapper(
+      categoryController.updateCategory(req),
+    );
+    if (error) return next(error);
+    res.status(204).send();
+  },
+);
 
 /**
  * @swagger
@@ -199,9 +229,12 @@ router.patch('/:id', protect, restrictTo('Admin'), async (req, res, next) => {
  *       500:
  *         description: Cannot delete — books still assigned, or server error
  */
+
 // admin-restricted
 router.delete('/:id', protect, restrictTo('Admin'), async (req, res, next) => {
-  const [error, data] = await asyncWrapper(categoryController.deleteCategory(req));
+  const [error, data] = await asyncWrapper(
+    categoryController.deleteCategory(req),
+  );
   if (error) return next(error);
   res.status(204).send();
 });

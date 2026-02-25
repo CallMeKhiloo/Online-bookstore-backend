@@ -4,7 +4,6 @@ const dotenv = require('dotenv');
 const path = require('path');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
-const cors = require('cors');
 
 const router = require('./routes');
 
@@ -23,12 +22,6 @@ mongoose
   });
 
 const app = express();
-
-app.use(
-  cors({
-    origin: 'http://localhost:4200',
-  }),
-);
 
 //global middlewares
 app.use(express.static(path.join(__dirname, 'public'))); // to serve static files

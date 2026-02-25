@@ -49,10 +49,10 @@ const router = express.Router();
  */
 router.get('/signature', async (req, res, next) => {
   try {
-    const data = uploadController();
+    const data = uploadController.uploadController();
     res.status(200).json({
       signature: data.signature,
-      timestamps: data.timestamps,
+      timestamp: data.timestamp,
       cloudName : process.env.CLOUDINARY_CLOUD_NAME,
       apiKey: process.env.CLOUDINARY_API_KEY,
       folder: 'book-covers'

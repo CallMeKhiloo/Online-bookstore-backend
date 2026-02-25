@@ -14,7 +14,7 @@ const database = process.env.DATABASE_URI;
 mongoose
   .connect(database)
   .then(() => {
-    console.log('CONNECTED TO THE DATABASE');
+    console.log('CONNECTED TO THE DATABASE ✅💪');
   })
   .catch((err) => {
     console.error(err.message);
@@ -45,5 +45,5 @@ app.use((error, req, res, next) => {
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
-  console.log(`server is running on port ${port}`);
+  console.log(`server is running on port ${port} 🚀✨`);
 });

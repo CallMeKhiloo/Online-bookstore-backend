@@ -22,12 +22,45 @@ Authorization: Bearer <JWT_TOKEN>
 
 ---
 
+## Database Transactions
+The Order API uses **MongoDB transactions** for the `POST /order` endpoint to ensure data consistency and atomicity:
+
+### What This Means
+- **Atomic Operations**: Order creation, book validation, and cart clearing all succeed or fail together
+- **No Partial Updates**: If any operation fails (e.g., book not found, validation error), ALL changes are rolled back
+- **Cart Safety**: Cart is only cleared when the order is successfully created
+- **Data Consistency**: Book prices and inventory are locked during the transaction
+
+### How It Works
+1. **Start Transaction**: A database session begins
+2. **Validate Books**: All books in the order are validated within the session
+3. **Fetch Cart** (if applicable): Cart items are read within the transaction
+4. **Create Order**: Order is created with locked data
+5. **Clear Cart**: Cart is emptied (if using cart items)
+6. **Commit or Rollback**: All changes are committed together or rolled back on error
+
+### Example Scenarios
+
+**Scenario 1: Successful Order**
+- ✅ Books validated → Order created → Cart cleared → Transaction committed
+- Result: Clean, complete order with empty cart
+
+**Scenario 2: Book Not Found**
+- ❌ Book validation fails → Entire transaction rolls back
+- Result: No order created, cart unchanged, user sees error
+
+**Scenario 3: Database Error During Order Creation**
+- ❌ Error occurs → Transaction automatically rolls back
+- Result: Cart remains full, no partial order created
+
+---
+
 ## User Endpoints
 
 ### 1. Create Order
 **Endpoint:** `POST /order`
 
-**Description:** Create a new order from cart items or provided items. Automatically calculates the total amount from book prices.
+**Description:** Create a new order from cart items or provided items. Automatically calculates the total amount from book prices. **Uses MongoDB transactions to ensure atomicity** - all operations succeed together or the entire transaction is rolled back.
 
 **Authorization:** User (any authenticated user)
 
@@ -695,6 +728,7 @@ curl -X GET http://localhost:8000/order/my-orders/ORDER_ID \
 
 ## Testing Checklist
 
+**Basic Functionality:**
 - [ ] User creates order with valid shipping details
 - [ ] User views their own orders
 - [ ] User cannot view other user's orders
@@ -711,6 +745,14 @@ curl -X GET http://localhost:8000/order/my-orders/ORDER_ID \
 - [ ] Validation errors return 400 with clear messages
 - [ ] Total amount is correctly calculated from items
 
+**Transaction-Specific Tests:**
+- [ ] Order created from cart, cart is cleared atomically
+- [ ] If book validation fails, order is NOT created and cart remains unchanged
+- [ ] If order creation fails, cart is NOT cleared
+- [ ] Multiple simultaneous orders don't cause race conditions
+- [ ] Transaction rolls back on database errors
+- [ ] Cart clearing only happens after order is successfully created
+
 ---
 
 ## Notes
@@ -721,3 +763,6 @@ curl -X GET http://localhost:8000/order/my-orders/ORDER_ID \
 - Pagination starts at page 1
 - Default limit is 10 items per page
 - Status filters are case-sensitive
+- **MongoDB transactions enabled**: The `POST /order` endpoint uses database transactions to ensure atomicity
+- **Session Management**: Transactions are automatically rolled back if any error occurs
+- **Data Consistency**: Cart is guaranteed to be cleared only when order creation succeeds

@@ -122,59 +122,79 @@ const updateOrderStatus = async (req) => {
   return order;
 };
 
-// User creates order from cart
+// User creates order from cart with transaction support
 const createOrder = async (req) => {
   const userId = req.user._id;
   const { shippingDetails, paymentMethod, items } = req.body;
+  const session = await Order.startSession();
+  session.startTransaction();
 
-  let itemsToOrder = [];
-  let totalAmount = 0;
+  try {
+    let itemsToOrder = [];
+    let totalAmount = 0;
 
-  // If items are provided in request, use those
-  if (items && items.length > 0) {
-    for (const item of items) {
-      const book = await Book.findById(item.book);
-      if (!book) throw new Error(`Book with ID ${item.book} not found`);
+    // If items are provided in request, use those
+    if (items && items.length > 0) {
+      for (const item of items) {
+        const book = await Book.findById(item.book).session(session);
+        if (!book) throw new Error(`Book with ID ${item.book} not found`);
 
-      itemsToOrder.push({
-        book: item.book,
-        quantity: item.quantity,
-        price: book.price,
-      });
+        itemsToOrder.push({
+          book: item.book,
+          quantity: item.quantity,
+          price: book.price,
+        });
 
-      totalAmount += book.price * item.quantity;
+        totalAmount += book.price * item.quantity;
+      }
+    } else {
+      // Otherwise, pull from user's cart
+      const cart = await Cart.findOne({ user: userId }).session(session);
+
+      if (!cart || cart.items.length === 0) {
+        throw new Error('Cart is empty. Add items before placing an order.');
+      }
+
+      itemsToOrder = cart.items;
+      totalAmount = cart.items.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0,
+      );
+
+      // Clear cart within transaction
+      cart.items = [];
+      await cart.save({ session });
     }
-  } else {
-    // Otherwise, pull from user's cart
-    const cart = await Cart.findOne({ user: userId });
 
-    if (!cart || cart.items.length === 0) {
-      throw new Error('Cart is empty. Add items before placing an order.');
-    }
-
-    itemsToOrder = cart.items;
-    totalAmount = cart.items.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0,
+    // Create order within transaction
+    const order = await Order.create(
+      [
+        {
+          user: userId,
+          items: itemsToOrder,
+          shippingDetails,
+          paymentMethod,
+          totalAmount: parseFloat(totalAmount.toFixed(2)),
+        },
+      ],
+      { session }
     );
 
-    // Clear cart after order creation
-    cart.items = [];
-    await cart.save();
+    // Commit transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    // Populate after transaction is committed
+    await order[0].populate('items.book');
+    await order[0].populate('user', 'firstName lastName email');
+
+    return order[0];
+  } catch (error) {
+    // Rollback transaction on any error
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
   }
-
-  const order = await Order.create({
-    user: userId,
-    items: itemsToOrder,
-    shippingDetails,
-    paymentMethod,
-    totalAmount: parseFloat(totalAmount.toFixed(2)),
-  });
-
-  await order.populate('items.book');
-  await order.populate('user', 'firstName lastName email');
-
-  return order;
 };
 
 module.exports = {

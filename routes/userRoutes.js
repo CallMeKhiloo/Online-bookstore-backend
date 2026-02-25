@@ -5,7 +5,7 @@ const { protect, restrictTo } = require('../middlewares/auth');
 
 // Import from auth.validation.js
 const {
-  signupSchema,
+  registerValidation,
   loginValidation,
   updateProfileSchema,
 } = require('../validations/auth.validation');
@@ -49,7 +49,7 @@ const router = express.Router();
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 
-router.post('/signup', validate(signupSchema), async (req, res, next) => {
+router.post('/signup', validate(registerValidation), async (req, res, next) => {
   const [error, user] = await asyncWrapper(userController.createUser(req));
 
   if (error) return next(error);

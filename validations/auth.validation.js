@@ -59,6 +59,7 @@ const updateProfileSchema = Joi.object({
   });
 
 module.exports = {
+  signupSchema: registerValidation,
   registerValidation,
   loginValidation,
   updateProfileSchema,

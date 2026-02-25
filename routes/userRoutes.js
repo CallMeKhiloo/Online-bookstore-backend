@@ -2,11 +2,15 @@ const express = require('express');
 const { userController } = require('../controllers');
 const asyncWrapper = require('../helpers/asyncWrapper');
 const { protect, restrictTo } = require('../middlewares/auth');
+
+// Import from auth.validation.js
 const {
   signupSchema,
-  loginSchema,
+  loginValidation,
   updateProfileSchema,
-} = require('../validations/userValidation');
+} = require('../validations/auth.validation');
+
+// Import the generic validate middleware
 const validate = require('../middlewares/validation');
 
 const router = express.Router();
@@ -44,6 +48,7 @@ const router = express.Router();
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
+
 router.post('/signup', validate(signupSchema), async (req, res, next) => {
   const [error, user] = await asyncWrapper(userController.createUser(req));
 
@@ -93,7 +98,8 @@ router.post('/signup', validate(signupSchema), async (req, res, next) => {
  *               status: unsuccessful
  *               message: User name or password is not correct
  */
-router.post('/login', validate(loginSchema), async (req, res, next) => {
+
+router.post('/login', validate(loginValidation), async (req, res, next) => {
   const [error, token] = await asyncWrapper(userController.login(req));
 
   if (error) return next(error);

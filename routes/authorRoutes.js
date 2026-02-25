@@ -1,8 +1,15 @@
 const express = require('express');
-const {authorController} = require('../controllers');
+const { authorController } = require('../controllers');
 const asyncWrapper = require('../helpers/asyncWrapper');
 const router = express.Router();
-const { protect,restrictTo } = require('../middlewares/auth');
+const { protect, restrictTo } = require('../middlewares/auth');
+
+// Import Validation
+const validate = require('../middlewares/validation');
+const {
+  createAuthorSchema,
+  updateAuthorSchema,
+} = require('../validations/author.validation');
 
 /**
  * @swagger
@@ -41,10 +48,9 @@ router.get('/', async (req, res, next) => {
   res.status(200).json({
     status: 'successful',
     len: data.length,
-    data
+    data,
   });
 });
-
 
 /**
  * @swagger
@@ -68,15 +74,23 @@ router.get('/', async (req, res, next) => {
  */
 
 // Admin-restricted
-router.post('/', protect, restrictTo('Admin'), async (req, res, next) => {
-  const [error, data] = await asyncWrapper(authorController.createAuthor(req));
-  if (error) return next(error);  
-  res.status(201).json({
-    status: 'successful',
-    len: 1,
-    data
-  });
-});
+router.post(
+  '/',
+  protect,
+  restrictTo('Admin'),
+  validate(createAuthorSchema),
+  async (req, res, next) => {
+    const [error, data] = await asyncWrapper(
+      authorController.createAuthor(req),
+    );
+    if (error) return next(error);
+    res.status(201).json({
+      status: 'successful',
+      len: 1,
+      data,
+    });
+  },
+);
 
 /**
  * @swagger
@@ -103,7 +117,7 @@ router.get('/:id', async (req, res, next) => {
   res.status(200).json({
     status: 'successful',
     len: 1,
-    data
+    data,
   });
 });
 
@@ -140,15 +154,22 @@ router.get('/:id', async (req, res, next) => {
  *         description: Author not found or server error
  */
 
-router.get('/:id/books', protect, restrictTo('Admin'), async (req, res, next) => {
-  const [error, data] = await asyncWrapper(authorController.getBooksByAuthor(req));
-  if (error) return next(error);
-  res.status(200).json({
-    status: 'successful',
-    len: data.length,
-    data
-  });
-});
+router.get(
+  '/:id/books',
+  protect,
+  restrictTo('Admin'),
+  async (req, res, next) => {
+    const [error, data] = await asyncWrapper(
+      authorController.getBooksByAuthor(req),
+    );
+    if (error) return next(error);
+    res.status(200).json({
+      status: 'successful',
+      len: data.length,
+      data,
+    });
+  },
+);
 
 /**
  * @swagger
@@ -177,11 +198,19 @@ router.get('/:id/books', protect, restrictTo('Admin'), async (req, res, next) =>
  */
 
 // Admin-restricted
-router.patch('/:id', protect, restrictTo('Admin'), async (req, res, next) => {
-  const [error, data] = await asyncWrapper(authorController.updateAuthor(req));
-  if (error) return next(error);
-  res.status(204).send();
-});
+router.patch(
+  '/:id',
+  protect,
+  restrictTo('Admin'),
+  validate(updateAuthorSchema),
+  async (req, res, next) => {
+    const [error, data] = await asyncWrapper(
+      authorController.updateAuthor(req),
+    );
+    if (error) return next(error);
+    res.status(204).send();
+  },
+);
 
 /**
  * @swagger
@@ -210,6 +239,5 @@ router.delete('/:id', protect, restrictTo('Admin'), async (req, res, next) => {
   if (error) return next(error);
   res.status(204).send();
 });
-
 
 module.exports = router;

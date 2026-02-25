@@ -1,10 +1,16 @@
 const express = require('express');
-const {bookController} = require('../controllers');
+const { bookController } = require('../controllers');
 const asyncWrapper = require('../helpers/asyncWrapper');
-const { protect,restrictTo } = require('../middlewares/auth');
+const { protect, restrictTo } = require('../middlewares/auth');
+
+// Import Validation
+const validate = require('../middlewares/validation');
+const {
+  createBookSchema,
+  updateBookSchema,
+} = require('../validations/book.validation');
 
 const router = express.Router();
-
 
 /**
  * @swagger
@@ -75,16 +81,16 @@ const router = express.Router();
  *                   items:
  *                     $ref: '#/components/schemas/Book'
  */
+
 router.get('/', async (req, res, next) => {
   const [error, data] = await asyncWrapper(bookController.getAllBooks(req));
   if (error) return next(error);
   res.status(200).json({
     status: 'successful',
     len: data.length,
-    data
+    data,
   });
 });
-
 
 /**
  * @swagger
@@ -110,15 +116,22 @@ router.get('/', async (req, res, next) => {
  *       500:
  *         description: Server error
  */
-router.post('/', protect, restrictTo('Admin'), async (req, res, next) => {
-  const [error, data] = await asyncWrapper(bookController.createBook(req));
-  if (error) return next(error);
-  res.status(201).json({
-    status: 'successful',
-    len: 1,
-    data
-  });
-});
+
+router.post(
+  '/',
+  protect,
+  restrictTo('Admin'),
+  validate(createBookSchema),
+  async (req, res, next) => {
+    const [error, data] = await asyncWrapper(bookController.createBook(req));
+    if (error) return next(error);
+    res.status(201).json({
+      status: 'successful',
+      len: 1,
+      data,
+    });
+  },
+);
 
 /**
  * @swagger
@@ -148,16 +161,16 @@ router.post('/', protect, restrictTo('Admin'), async (req, res, next) => {
  *       500:
  *         description: Book not found or server error
  */
+
 router.get('/:id', async (req, res, next) => {
   const [error, data] = await asyncWrapper(bookController.getBook(req));
   if (error) return next(error);
   res.status(200).json({
     status: 'successful',
     len: 1,
-    data
+    data,
   });
 });
-
 
 /**
  * @swagger
@@ -184,12 +197,19 @@ router.get('/:id', async (req, res, next) => {
  *       500:
  *         description: Server error
  */
+
 // admin-restricted
-router.patch('/:id', protect, restrictTo('Admin'), async (req, res, next) => {
-  const [error, data] = await asyncWrapper(bookController.updateBook(req));
-  if (error) return next(error);
-  res.status(204).send();
-});
+router.patch(
+  '/:id',
+  protect,
+  restrictTo('Admin'),
+  validate(updateBookSchema),
+  async (req, res, next) => {
+    const [error, data] = await asyncWrapper(bookController.updateBook(req));
+    if (error) return next(error);
+    res.status(204).send();
+  },
+);
 
 /**
  * @swagger
@@ -211,11 +231,12 @@ router.patch('/:id', protect, restrictTo('Admin'), async (req, res, next) => {
  *       500:
  *         description: Server error
  */
+
 // admin-restricted
 router.delete('/:id', protect, restrictTo('Admin'), async (req, res, next) => {
   const [error, data] = await asyncWrapper(bookController.deleteBook(req));
   if (error) return next(error);
-  res.status(204).send()
+  res.status(204).send();
 });
 
 module.exports = router;

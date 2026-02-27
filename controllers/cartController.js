@@ -48,7 +48,7 @@ const addToCart = async (req) => {
 
   // Populate book details before returning
   await cart.populate('items.book');
-
+  
   // Calculate total price
   const totalPrice = cart.items.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -76,7 +76,7 @@ const removeFromCart = async (req) => {
   await cart.save();
 
   await cart.populate('items.book');
-
+  
   // Calculate total price
   const totalPrice = cart.items.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -154,7 +154,7 @@ const updateItemQuantity = async (req) => {
   await cart.save();
 
   await cart.populate('items.book');
-
+  
   // Calculate total price
   const totalPrice = cart.items.reduce(
     (sum, item) => sum + item.price * item.quantity,

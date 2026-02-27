@@ -29,38 +29,12 @@ const registerValidation = Joi.object({
   }),
 });
 
-// Schema for User Login
 const loginValidation = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().required(),
 });
 
-// Schema for Updating User Profile
-const updateProfileSchema = Joi.object({
-  email: Joi.string().email().messages({
-    'string.email': 'Please provide a valid email address.',
-  }),
-
-  firstName: Joi.string().min(3).max(15),
-
-  lastName: Joi.string().min(3).max(15),
-
-  DOB: Joi.date().iso().less('now'),
-
-  // SECURITY: Prevent privilege escalation. Even if they are just updating
-  // their name, we must block any sneaky attempts to change their role to 'Admin'.
-  role: Joi.forbidden().messages({
-    'any.unknown': 'You are not allowed to modify the role field.',
-  }),
-})
-  .min(1)
-  .messages({
-    'object.min': 'You must provide at least one field to update.',
-  });
-
 module.exports = {
-  signupSchema: registerValidation,
   registerValidation,
   loginValidation,
-  updateProfileSchema,
 };

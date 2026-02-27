@@ -4,7 +4,11 @@ const dotenv = require('dotenv');
 const path = require('path');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
+<<<<<<< HEAD
 const cors = require('cors');
+=======
+const { requestLogger } = require('./middlewares/logger');
+>>>>>>> 245ca0a (fix: fixed the merge conflict)
 
 const router = require('./routes');
 
@@ -15,7 +19,11 @@ const database = process.env.DATABASE_URI;
 mongoose
   .connect(database)
   .then(() => {
+<<<<<<< HEAD
     console.log('CONNECTED TO THE DATABASE ✅💪');
+=======
+    console.log('CONNECTED TO THE DATABASE');
+>>>>>>> 245ca0a (fix: fixed the merge conflict)
   })
   .catch((err) => {
     console.error(err.message);
@@ -35,6 +43,8 @@ app.use(express.static(path.join(__dirname, 'public'))); // to serve static file
 app.use(express.json());
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use(requestLogger); // to log HTTP requests using morgan and winston
+
 app.use(router);
 
 app.use((req, res) => {

@@ -2,7 +2,7 @@ const express = require('express');
 const { reviewController } = require('../controllers');
 const asyncWrapper = require('../helpers/asyncWrapper');
 const { protect, restrictTo } = require('../middlewares/auth');
-const validate = require('../middlewares/validation');
+const validate = require('../middlewares/validate');
 const {
   createReviewSchema,
   updateReviewSchema,

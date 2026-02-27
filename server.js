@@ -35,6 +35,11 @@ app.use(
 app.use(express.static(path.join(__dirname, 'public'))); // to serve static files
 app.use(express.json());
 
+app.use(cors({
+  origin: 'http://localhost:4200',
+  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+}));
+
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(requestLogger); // to log HTTP requests using morgan and winston
 

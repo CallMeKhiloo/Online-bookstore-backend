@@ -190,7 +190,7 @@ router.get(
  *           schema:
  *             $ref: '#/components/schemas/AuthorBody'
  *     responses:
- *       204:
+ *       200:
  *         description: Author updated
  *       500:
  *         description: Server error

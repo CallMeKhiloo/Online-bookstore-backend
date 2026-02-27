@@ -4,6 +4,7 @@ const categoryController = require('./categoryController');
 const authorController = require('./authorController');
 const bookController = require('./bookController');
 const cartController = require('./cartController');
+const orderController = require('./orderController');
 
 module.exports = {
   userController,
@@ -11,5 +12,6 @@ module.exports = {
   categoryController,
   authorController,
   bookController,
-  cartController
+  cartController,
+  orderController
 };

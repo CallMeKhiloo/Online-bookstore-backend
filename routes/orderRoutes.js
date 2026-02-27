@@ -2,7 +2,7 @@ const express = require('express');
 const { orderController } = require('../controllers');
 const asyncWrapper = require('../helpers/asyncWrapper');
 const { protect, restrictTo } = require('../middlewares/auth');
-const validate = require('../middlewares/validation');
+const validate = require('../middlewares/validate');
 const {
   createOrderSchema,
   updateOrderStatusSchema,
@@ -80,9 +80,7 @@ router.post(
   protect,
   validate(createOrderSchema),
   async (req, res, next) => {
-    const [error, order] = await asyncWrapper(
-      orderController.createOrder(req),
-    );
+    const [error, order] = await asyncWrapper(orderController.createOrder(req));
 
     if (error) return next(error);
     res.status(201).json({
@@ -143,9 +141,7 @@ router.get('/my-orders', protect, async (req, res, next) => {
  *         description: Server error
  */
 router.get('/my-orders/:orderId', protect, async (req, res, next) => {
-  const [error, order] = await asyncWrapper(
-    orderController.getUserOrder(req),
-  );
+  const [error, order] = await asyncWrapper(orderController.getUserOrder(req));
 
   if (error) return next(error);
   res.status(200).json({

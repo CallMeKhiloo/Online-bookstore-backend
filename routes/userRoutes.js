@@ -5,7 +5,7 @@ const { protect, restrictTo } = require('../middlewares/auth');
 const validate = require('../middlewares/validate');
 const {
   registerValidation,
-  loginSchema,
+  loginValidation,
   // to do updateProfileSchema
 } = require('../validations/auth.validation');
 

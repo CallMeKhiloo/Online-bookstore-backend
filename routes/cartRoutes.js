@@ -2,7 +2,7 @@ const express = require('express');
 const { cartController } = require('../controllers');
 const asyncWrapper = require('../helpers/asyncWrapper');
 const { protect } = require('../middlewares/auth');
-const validate = require('../middlewares/validation');
+const validate = require('../middlewares/validate');
 const {
   addToCartSchema,
   updateCartItemSchema,
@@ -117,15 +117,20 @@ router.get('/', protect, async (req, res, next) => {
  *       500:
  *         description: Server error
  */
-router.post('/add', protect, validate(addToCartSchema), async (req, res, next) => {
-  const [error, cart] = await asyncWrapper(cartController.addToCart(req));
+router.post(
+  '/add',
+  protect,
+  validate(addToCartSchema),
+  async (req, res, next) => {
+    const [error, cart] = await asyncWrapper(cartController.addToCart(req));
 
-  if (error) return next(error);
-  res.status(201).json({
-    status: 'successful',
-    data: cart,
-  });
-});
+    if (error) return next(error);
+    res.status(201).json({
+      status: 'successful',
+      data: cart,
+    });
+  },
+);
 
 /**
  * @swagger

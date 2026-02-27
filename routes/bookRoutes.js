@@ -3,8 +3,7 @@ const { bookController } = require('../controllers');
 const asyncWrapper = require('../helpers/asyncWrapper');
 const { protect, restrictTo } = require('../middlewares/auth');
 
-// Import Validation
-const validate = require('../middlewares/validation');
+const validate = require('../middlewares/validate');
 const {
   createBookSchema,
   updateBookSchema,
@@ -116,22 +115,15 @@ router.get('/', async (req, res, next) => {
  *       500:
  *         description: Server error
  */
-
-router.post(
-  '/',
-  protect,
-  restrictTo('Admin'),
-  validate(createBookSchema),
-  async (req, res, next) => {
-    const [error, data] = await asyncWrapper(bookController.createBook(req));
-    if (error) return next(error);
-    res.status(201).json({
-      status: 'successful',
-      len: 1,
-      data,
-    });
-  },
-);
+router.post('/', protect, restrictTo('Admin'), async (req, res, next) => {
+  const [error, data] = await asyncWrapper(bookController.createBook(req));
+  if (error) return next(error);
+  res.status(201).json({
+    status: 'successful',
+    len: 1,
+    data,
+  });
+});
 
 /**
  * @swagger

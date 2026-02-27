@@ -1,6 +1,6 @@
 const Joi = require('joi');
 
-// Custom regex to strictly validate MongoDB ObjectIds
+// Custom regex to strictly validate MongoDB ObjectIds (24-char hex string)
 const objectIdSchema = Joi.string()
   .pattern(/^[0-9a-fA-F]{24}$/)
   .messages({
@@ -14,6 +14,7 @@ const createBookSchema = Joi.object({
   price: Joi.number().min(0.01).required(),
 
   // Stock is optional in the request because your DB has a default: 1.
+  // But if they DO send it, it must be an integer >= 1.
   stock: Joi.number().integer().min(1).optional(),
 
   author: objectIdSchema.required(),

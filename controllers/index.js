@@ -14,6 +14,6 @@ module.exports = {
   authorController,
   bookController,
   cartController,
-  orderController
+  orderController,
   reviewController,
 };

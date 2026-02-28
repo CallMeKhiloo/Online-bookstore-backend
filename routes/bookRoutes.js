@@ -75,7 +75,7 @@ const router = express.Router();
  *                   example: successful
  *                 len:
  *                   type: integer
- *                 data:s
+ *                 data:
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/Book'
@@ -218,7 +218,7 @@ router.patch(
  *         schema:
  *           type: string
  *     responses:
- *       200:
+ *       204:
  *         description: Book deleted successfully
  *       500:
  *         description: Server error
@@ -228,11 +228,7 @@ router.patch(
 router.delete('/:id', protect, restrictTo('Admin'), async (req, res, next) => {
   const [error, data] = await asyncWrapper(bookController.deleteBook(req));
   if (error) return next(error);
-  res.status(200).json({
-    status: 'successful',
-    len: data.length,
-    data
-  })
+  res.status(204).send();
 });
 
 module.exports = router;

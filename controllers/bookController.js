@@ -1,20 +1,29 @@
 const Book = require('../models/bookModel');
 
 const getAllBooks = async (req) => {
-  const { category, author, minPrice, maxPrice, search, page = 1, limit = 20 } = req.query;
+  const { category, author, minPrice, maxPrice, search, sort = '-createdAt', page = 1, limit = 20 } = req.query;
   const filter = {};
   if (category) filter.category = category;
-  if (author) filter.author =  author;
+  if (author) filter.author = author;
   if (minPrice || maxPrice) filter.price = {};
   if (minPrice) filter.price.$gte = Number(minPrice);
   if (maxPrice) filter.price.$lte = Number(maxPrice);
-  if (search) filter.name = {$regex: search, $options: 'i'};
+  if (search) filter.name = { $regex: search, $options: 'i' };
+
+  // sort param: e.g. '-createdAt', 'ratingsAverage', 'name', '-name'
+  const sortObj = {};
+  const sortFields = sort.split(',');
+  sortFields.forEach((f) => {
+    if (f.startsWith('-')) sortObj[f.slice(1)] = -1;
+    else sortObj[f] = 1;
+  });
 
   const books = await Book.find(filter)
-  .populate('author')
-  .populate('category')
-  .skip((page -1 ) * limit)
-  .limit(Number(limit));
+    .populate('author')
+    .populate('category')
+    .sort(sortObj)
+    .skip((page - 1) * limit)
+    .limit(Number(limit));
   return books;
 };
 
@@ -31,7 +40,7 @@ const getBook = async (req) => {
 };
 
 const updateBook = async (req) => {
-  const book = await Book.findByIdAndUpdate(req.params.id, req.body, {new:true, runValidators: true});
+  const book = await Book.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
   if (!book) throw new Error('can not update book: id is not valid');
   return book;
 }

@@ -15,5 +15,5 @@ module.exports = {
   bookController,
   cartController,
   orderController,
-  reviewController,
+  reviewController
 };

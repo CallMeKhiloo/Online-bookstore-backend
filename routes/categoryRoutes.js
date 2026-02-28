@@ -186,7 +186,7 @@ router.get('/:id/books', async (req, res, next) => {
  *           schema:
  *             $ref: '#/components/schemas/CategoryBody'
  *     responses:
- *       204:
+ *       200:
  *         description: Category updated
  *       500:
  *         description: Server error

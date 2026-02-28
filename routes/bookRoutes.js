@@ -127,6 +127,40 @@ router.post('/', protect, restrictTo('Admin'), async (req, res, next) => {
 
 /**
  * @swagger
+ * /book/latest:
+ *   get:
+ *     summary: Get the latest 10 books added to the store
+ *     tags: [Books]
+ *     responses:
+ *       200:
+ *         description: List of latest 10 books
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: successful
+ *                 len:
+ *                   type: integer
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Book'
+ */
+router.get('/latest', async (req, res, next) => {
+  const [error, data] = await asyncWrapper(bookController.getLatestBooks(req));
+  if (error) return next(error);
+  res.status(200).json({
+    status: 'successful',
+    len: data.length,
+    data,
+  });
+});
+
+/**
+ * @swagger
  * /book/{id}:
  *   get:
  *     summary: Get a single book by ID

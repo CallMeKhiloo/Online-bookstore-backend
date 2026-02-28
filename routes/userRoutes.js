@@ -181,4 +181,14 @@ router.post(
   },
 );
 
+router.get('/profile', protect, async (req, res, next) => {
+  const [error, user] = await asyncWrapper(userController.getMe(req));
+
+  if (error) return next(error);
+  res.status(200).json({
+    status: 'successful',
+    data: user,
+  });
+});
+
 module.exports = router;

@@ -1,7 +1,13 @@
 const Users = require('../models/userModel');
 
+const getMe = async (req) => {
+  const user = await Users.findById(req.user._id);
+  return user;
+};
+
 const createUser = async (req) => {
   const data = req.body;
+  console.log(data);
   const user = await Users.create(data);
   return user;
 };
@@ -57,4 +63,5 @@ module.exports = {
   getAllUsers,
   deleteUser,
   updateUser,
+  getMe,
 };

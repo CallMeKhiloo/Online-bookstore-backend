@@ -26,9 +26,9 @@ const userSchema = new mongoose.Schema(
       minLength: 3,
       maxLength: 15,
     },
-    DOB: {
+    dob: {
       type: Date,
-      required: false,
+      required: true,
     },
     role: {
       type: String,

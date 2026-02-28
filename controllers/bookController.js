@@ -51,11 +51,21 @@ const deleteBook = async (req) => {
   return book;
 }
 
+const getLatestBooks = async (req) => {
+  const books = await Book.find()
+    .populate('author')
+    .populate('category')
+    .sort({ createdAt: -1 })
+    .limit(10);
+  return books;
+};
+
 
 module.exports = {
   getAllBooks,
   createBook,
   getBook,
   updateBook,
-  deleteBook
+  deleteBook,
+  getLatestBooks
 };

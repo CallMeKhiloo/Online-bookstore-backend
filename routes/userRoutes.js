@@ -106,6 +106,16 @@ router.post('/login', validate(loginValidation), async (req, res, next) => {
   });
 });
 
+router.get('/verify-email/:token', async (req, res, next) => {
+  const [error] = await asyncWrapper(userController.verifyEmail(req));
+
+  if (error) return next(error);
+  res.status(200).json({
+    status: 'successful',
+    message: 'Email verified successfully.',
+  });
+});
+
 router.patch(
   '/profile',
   protect,

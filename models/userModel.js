@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 
 const userSchema = new mongoose.Schema(
   {
@@ -13,6 +14,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       minLength: 8,
+      select: false,
     },
     firstName: {
       type: String,
@@ -40,6 +42,18 @@ const userSchema = new mongoose.Schema(
       enum: ['active', 'banned'],
       default: 'active',
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+      select: false,
+    },
+    verificationTokenExpiresAt: {
+      type: Date,
+      select: false,
+    },
   },
   { timestamps: true },
 );
@@ -59,9 +73,16 @@ userSchema.methods.generateJWT = function () {
   );
 };
 
+userSchema.methods.generateVerificationToken = function () {
+  const token = crypto.randomBytes(32).toString('hex');
+  this.verificationToken = token;
+  this.verificationTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000;
+  return token;
+};
+
 // document middlewares
 userSchema.pre('save', async function () {
-  if (!this.isModified('password')) return next(); // don't hash if password hasn't changed
+  if (!this.isModified('password')) return; // don't hash if password hasn't changed
   this.password = await bcrypt.hash(this.password, 10); // async in order not to block the event loop
 });
 

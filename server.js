@@ -5,10 +5,10 @@ const path = require('path');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
 const cors = require('cors');
-const morgan = require('morgan');
 const { requestLogger } = require('./middlewares/logger');
 
 const router = require('./routes');
+const globalErrorHandler = require('./middlewares/errorHandler');
 
 dotenv.config({ path: path.join(__dirname, '.env') });
 require('./config/cloudinary');
@@ -32,9 +32,6 @@ app.use(
   }),
 );
 
-// dev logging
-app.use(morgan('dev'));
-
 //global middlewares
 app.use(express.static(path.join(__dirname, 'public'))); // to serve static files
 app.use(express.json());
@@ -57,10 +54,7 @@ app.use((req, res) => {
 });
 
 //global error middleware
-app.use((error, req, res, next) => {
-  console.log(error.message);
-  res.status(500).json({ status: 'unsuccessful', message: error.message });
-});
+app.use(globalErrorHandler);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

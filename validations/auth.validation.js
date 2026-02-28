@@ -57,8 +57,29 @@ const updateProfileSchema = Joi.object({
     'object.min': 'You must provide at least one field to update.',
   });
 
+const adminUpdateUserSchema = Joi.object({
+  email: Joi.string().email().messages({
+    'string.email': 'Please provide a valid email address.',
+  }),
+
+  firstName: Joi.string().min(3).max(15),
+
+  lastName: Joi.string().min(3).max(15),
+
+  dob: Joi.date().iso().less('now'),
+
+  role: Joi.string().valid('User', 'Admin').messages({
+    'any.only': 'Role must be either User or Admin.',
+  }),
+})
+  .min(1)
+  .messages({
+    'object.min': 'You must provide at least one field to update.',
+  });
+
 module.exports = {
   registerValidation,
   loginValidation,
   updateProfileSchema,
+  adminUpdateUserSchema,
 };

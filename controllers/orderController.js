@@ -1,6 +1,7 @@
 const Order = require('../models/orderModel');
 const Cart = require('../models/cartModel');
 const Book = require('../models/bookModel');
+const customError = require('../helpers/customError');
 
 // User views their own order history
 const getUserOrders = async (req) => {
@@ -36,8 +37,9 @@ const getUserOrder = async (req) => {
     .populate('user', 'firstName lastName email');
 
   if (!order) {
-    throw new Error(
+    throw new customError(
       'Order not found or you do not have permission to view this order',
+      404
     );
   }
 
@@ -109,7 +111,7 @@ const updateOrderStatus = async (req) => {
 
   const order = await Order.findById(orderId);
 
-  if (!order) throw new Error('Order not found');
+  if (!order) throw new customError('Order not found', 404);
 
   if (orderStatus) order.orderStatus = orderStatus;
   if (paymentStatus) order.paymentStatus = paymentStatus;
@@ -137,7 +139,7 @@ const createOrder = async (req) => {
     if (items && items.length > 0) {
       for (const item of items) {
         const book = await Book.findById(item.book).session(session);
-        if (!book) throw new Error(`Book with ID ${item.book} not found`);
+        if (!book) throw new customError(`Book with ID ${item.book} not found`, 404);
 
         itemsToOrder.push({
           book: item.book,
@@ -152,7 +154,7 @@ const createOrder = async (req) => {
       const cart = await Cart.findOne({ user: userId }).session(session);
 
       if (!cart || cart.items.length === 0) {
-        throw new Error('Cart is empty. Add items before placing an order.');
+        throw new customError('Cart is empty. Add items before placing an order.', 400);
       }
 
       itemsToOrder = cart.items;
@@ -193,7 +195,7 @@ const createOrder = async (req) => {
     // Rollback transaction on any error
     await session.abortTransaction();
     session.endSession();
-    throw error;
+    throw new customError(error.message || 'Failed to create order', error.statusCode || 500);
   }
 };
 

@@ -1,5 +1,6 @@
 const Cart = require('../models/cartModel');
 const Book = require('../models/bookModel');
+const customError = require('../helpers/customError');
 
 // Add item to cart or update quantity
 const addToCart = async (req) => {
@@ -8,7 +9,7 @@ const addToCart = async (req) => {
 
   // Verify book exists and get its price
   const bookData = await Book.findById(book);
-  if (!bookData) throw new Error('Book not found. Invalid book ID.');
+  if (!bookData) throw new customError('Book not found. Invalid book ID.', 404);
 
   // Find or create cart for user
   let cart = await Cart.findOne({ user: userId });
@@ -68,7 +69,7 @@ const removeFromCart = async (req) => {
 
   const cart = await Cart.findOne({ user: userId });
 
-  if (!cart) throw new Error('Cart not found for this user.');
+  if (!cart) throw new customError('Cart not found for this user.', 404);
 
   // Filter out the book from items
   cart.items = cart.items.filter((item) => item.book.toString() !== bookId);
@@ -125,7 +126,7 @@ const clearCart = async (req) => {
 
   const cart = await Cart.findOne({ user: userId });
 
-  if (!cart) throw new Error('Cart not found for this user.');
+  if (!cart) throw new customError('Cart not found for this user.', 404);
 
   cart.items = [];
   await cart.save();
@@ -144,11 +145,11 @@ const updateItemQuantity = async (req) => {
 
   const cart = await Cart.findOne({ user: userId });
 
-  if (!cart) throw new Error('Cart not found for this user.');
+  if (!cart) throw new customError('Cart not found for this user.', 404);
 
   const item = cart.items.find((i) => i.book.toString() === bookId);
 
-  if (!item) throw new Error('Item not found in cart.');
+  if (!item) throw new customError('Item not found in cart.', 404);
 
   item.quantity = quantity;
   await cart.save();

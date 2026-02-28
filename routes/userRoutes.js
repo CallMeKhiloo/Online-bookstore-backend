@@ -122,4 +122,63 @@ router.patch(
   },
 );
 
+/**
+ * @swagger
+ * /users:
+ * get:
+ * summary: Get all users (Admin only)
+ * tags: [Auth]
+ */
+router.get(
+  '/',
+  protect, // 1. Check if they are logged in
+  restrictTo('Admin'), // 2. Check if their role is exactly 'Admin'
+  async (req, res, next) => {
+    const [error, users] = await asyncWrapper(userController.getAllUsers(req));
+
+    if (error) return next(error);
+
+    res.status(200).json({
+      status: 'successful',
+      results: users.length, // Helpful for debugging
+      data: users,
+    });
+  },
+);
+
+router.delete('/:id', protect, restrictTo('Admin'), async (req, res, next) => {
+  const [error] = await asyncWrapper(userController.deleteUser(req));
+  if (error) return next(error);
+  res.status(204).json({ status: 'successful', data: null });
+});
+
+router.patch('/:id', protect, restrictTo('Admin'), async (req, res, next) => {
+  const [error, user] = await asyncWrapper(userController.updateUser(req));
+  if (error) return next(error);
+  res.status(200).json({ status: 'successful', data: user });
+});
+
+/**
+ * @swagger
+ * /users/admin/create:
+ *   post:
+ *     summary: Admin creates a new user (can set role)
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ */
+router.post(
+  '/admin/create',
+  protect,
+  restrictTo('Admin'),
+  async (req, res, next) => {
+    const [error, user] = await asyncWrapper(userController.createUser(req));
+    if (error) return next(error);
+    res.status(201).json({
+      status: 'successful',
+      data: user,
+    });
+  },
+);
+
 module.exports = router;

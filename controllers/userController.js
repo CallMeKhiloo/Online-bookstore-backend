@@ -19,15 +19,34 @@ const login = async (req) => {
 };
 
 const updateMe = async (req) => {
-  const updatedUser = await Users.findByIdAndUpdate(
-    req.user._id,
-    req.body,
-    {
-      returnDocument: 'after', // to return the updated doc
-      runValidators: true,
-    },
-  );
+  const updatedUser = await Users.findByIdAndUpdate(req.user._id, req.body, {
+    returnDocument: 'after', // to return the updated doc
+    runValidators: true,
+  });
 
+  return updatedUser;
+};
+
+const getAllUsers = async (req) => {
+  // .select('-password') ensures we never accidentally send hashes to the frontend
+  const users = await Users.find().select('-password');
+  return users;
+};
+
+// Delete a user by ID
+const deleteUser = async (req) => {
+  const user = await Users.findByIdAndDelete(req.params.id);
+  if (!user) throw new Error('User not found');
+  return user;
+};
+
+const updateUser = async (req) => {
+  const { id } = req.params;
+  const updatedUser = await Users.findByIdAndUpdate(id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+  if (!updatedUser) throw new Error('User not found');
   return updatedUser;
 };
 
@@ -35,4 +54,7 @@ module.exports = {
   createUser,
   login,
   updateMe,
+  getAllUsers,
+  deleteUser,
+  updateUser,
 };

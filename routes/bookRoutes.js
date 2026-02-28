@@ -86,8 +86,8 @@ router.get('/', async (req, res, next) => {
   if (error) return next(error);
   res.status(200).json({
     status: 'successful',
-    len: data.length,
-    data,
+    len: data.total,
+    data: data.books,
   });
 });
 

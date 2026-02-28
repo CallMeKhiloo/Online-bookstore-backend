@@ -18,13 +18,16 @@ const getAllBooks = async (req) => {
     else sortObj[f] = 1;
   });
 
-  const books = await Book.find(filter)
-    .populate('author')
-    .populate('category')
-    .sort(sortObj)
-    .skip((page - 1) * limit)
-    .limit(Number(limit));
-  return books;
+  const [books, total] = await Promise.all([
+    Book.find(filter)
+      .populate('author')
+      .populate('category')
+      .sort(sortObj)
+      .skip((page - 1) * limit)
+      .limit(Number(limit)),
+    Book.countDocuments(filter),
+  ]);
+  return { books, total };
 };
 
 const createBook = async (req) => {

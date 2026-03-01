@@ -16,7 +16,7 @@ const createUser = async (req) => {
   await sendVerificationEmail({
     to: user.email,
     subject: 'Email Verification',
-    text: `Please verify your email by clicking the following link: http://127.0.0.1:8000/users/verify-email/${verificationToken}`,
+    text: `Please verify your email by clicking the following link: ${process.env.FRONT_END_URL}/users/verify-email/${verificationToken}`,
   });
 
   return user;

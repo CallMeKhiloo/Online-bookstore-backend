@@ -28,7 +28,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: 'http://localhost:4200',
+    origin: process.env.FRONT_END_URL || 'http://localhost:4200',
   }),
 );
 
@@ -36,20 +36,15 @@ app.use(
 app.use(express.static(path.join(__dirname, 'public'))); // to serve static files
 app.use(express.json());
 
-app.use(cors({
-  origin: 'http://localhost:4200',
-  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
-}));
-
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-app.use(requestLogger); // to log HTTP requests using morgan and winston
 
 app.use(router);
+app.use(requestLogger); // to log HTTP requests using morgan and winston
 
 app.use((req, res) => {
   res.status(404).json({
     status: 'unsuccessful',
-    message: 'Page not found',
+    message: 'Page not found!!',
   });
 });
 

@@ -19,7 +19,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /path/to/your/project
+            cd /home/ubuntu/Online-bookstore-backend/
             git pull origin main
             npm i
             pm2 restart all

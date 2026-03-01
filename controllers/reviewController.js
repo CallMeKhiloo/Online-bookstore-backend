@@ -1,4 +1,5 @@
 const Review = require('../models/reviewModel');
+const customError = require('../helpers/customError');
 
 // Create a Review
 const createReview = async (req) => {
@@ -12,8 +13,9 @@ const createReview = async (req) => {
   });
 
   if (existingReview) {
-    throw new Error(
+    throw new customError(
       'You have already reviewed this book. Please update your existing review instead.',
+      400,
     );
   }
 
@@ -48,7 +50,7 @@ const getReview = async (req) => {
   );
 
   if (!review) {
-    throw new Error('Review not found');
+    throw new customError('Review not found', 404);
   }
 
   return review;
@@ -59,7 +61,7 @@ const updateReview = async (req) => {
   const review = await Review.findById(req.params.id);
 
   if (!review) {
-    throw new Error('Review not found');
+    throw new customError('Review not found', 404);
   }
 
   // SECURITY FIREWALL: Ensure the logged-in user actually owns this review.
@@ -67,7 +69,7 @@ const updateReview = async (req) => {
     review.user.toString() !== req.user._id.toString() &&
     req.user.role !== 'Admin'
   ) {
-    throw new Error('You do not have permission to edit this review.');
+    throw new customError('You do not have permission to edit this review.', 403);
   }
 
   const updatedReview = await Review.findByIdAndUpdate(
@@ -84,7 +86,7 @@ const deleteReview = async (req) => {
   const review = await Review.findById(req.params.id);
 
   if (!review) {
-    throw new Error('Review not found');
+    throw new customError('Review not found', 404);
   }
 
   // SECURITY FIREWALL: Same check as the update controller
@@ -92,7 +94,7 @@ const deleteReview = async (req) => {
     review.user.toString() !== req.user._id.toString() &&
     req.user.role !== 'Admin'
   ) {
-    throw new Error('You do not have permission to delete this review.');
+    throw new customError('You do not have permission to delete this review.', 403);
   }
 
   await Review.findByIdAndDelete(req.params.id);

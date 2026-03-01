@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const Users = require('../models/userModel');
+const customError = require('../helpers/customError');
 
 const protect = async (req, res, next) => {
   // 401 -> unauthorized
@@ -13,13 +14,13 @@ const protect = async (req, res, next) => {
     }
 
     if (!token)
-      throw new Error('You are not logged in! Please log in to get access.');
+      throw new customError('You are not logged in! Please log in to get access.', 401);
 
     const payload = jwt.verify(token, process.env.JWT_SECRET);
 
     const currentUser = await Users.findById(payload.userId);
     if (!currentUser)
-      throw new Error('The user belonging to this token no longer exists.');
+      throw new customError('The user belonging to this token no longer exists.', 401);
 
     req.user = currentUser;
     next();
@@ -37,8 +38,9 @@ const restrictTo = (...roles) => {
   */
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
-      const error = new Error(
+      const error = new customError(
         'You do not have permission to perform this action',
+        403
       );
       return next(error);
     }

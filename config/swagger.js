@@ -32,7 +32,7 @@ const options = {
             lastName:  { type: 'string', minLength: 3, maxLength: 15, example: 'Doe' },
             email:     { type: 'string', format: 'email', example: 'john@example.com' },
             password:  { type: 'string', minLength: 8, example: 'password123' },
-            DOB:       { type: 'string', format: 'date', example: '1995-06-15' },
+            dob:       { type: 'string', format: 'date', example: '1995-06-15' },
           },
         },
         LoginBody: {

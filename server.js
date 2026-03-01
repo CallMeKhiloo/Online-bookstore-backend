@@ -8,6 +8,7 @@ const cors = require('cors');
 const { requestLogger } = require('./middlewares/logger');
 
 const router = require('./routes');
+const globalErrorHandler = require('./middlewares/errorHandler');
 
 dotenv.config({ path: path.join(__dirname, '.env') });
 require('./config/cloudinary');
@@ -53,10 +54,7 @@ app.use((req, res) => {
 });
 
 //global error middleware
-app.use((error, req, res, next) => {
-  console.log(error.message);
-  res.status(500).json({ status: 'unsuccessful', message: error.message });
-});
+app.use(globalErrorHandler);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

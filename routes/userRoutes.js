@@ -6,7 +6,8 @@ const validate = require('../middlewares/validate');
 const {
   registerValidation,
   loginValidation,
-  // to do updateProfileSchema
+  updateProfileSchema,
+  adminUpdateUserSchema,
 } = require('../validations/auth.validation');
 
 const router = express.Router();
@@ -105,10 +106,20 @@ router.post('/login', validate(loginValidation), async (req, res, next) => {
   });
 });
 
+router.get('/verify-email/:token', async (req, res, next) => {
+  const [error] = await asyncWrapper(userController.verifyEmail(req));
+
+  if (error) return next(error);
+  res.status(200).json({
+    status: 'successful',
+    message: 'Email verified successfully.',
+  });
+});
+
 router.patch(
   '/profile',
   protect,
-  // todo
+  validate(updateProfileSchema),
   async (req, res, next) => {
     const [error, updatedUser] = await asyncWrapper(
       userController.updateMe(req),
@@ -180,5 +191,61 @@ router.post(
     });
   },
 );
+
+router.get('/profile', protect, async (req, res, next) => {
+  const [error, user] = await asyncWrapper(userController.getMe(req));
+
+  if (error) return next(error);
+  res.status(200).json({
+    status: 'successful',
+    data: user,
+  });
+});
+
+router.get('/', protect, restrictTo('Admin'), async (req, res, next) => {
+  const [error, users] = await asyncWrapper(userController.getAllUsers(req));
+
+  if (error) return next(error);
+  res.status(200).json({
+    status: 'successful',
+    len: users.length,
+    data: users,
+  });
+});
+
+router.get('/:id', protect, restrictTo('Admin'), async (req, res, next) => {
+  const [error, user] = await asyncWrapper(userController.getUserById(req));
+
+  if (error) return next(error);
+  res.status(200).json({
+    status: 'successful',
+    data: user,
+  });
+});
+
+router.patch(
+  '/:id',
+  protect,
+  restrictTo('Admin'),
+  validate(adminUpdateUserSchema),
+  async (req, res, next) => {
+    const [error, updatedUser] = await asyncWrapper(
+      userController.updateUserById(req),
+    );
+
+    if (error) return next(error);
+    res.status(200).json({
+      status: 'successful',
+      data: updatedUser,
+    });
+  },
+);
+
+router.delete('/:id', protect, restrictTo('Admin'), async (req, res, next) => {
+  const [error, user] = await asyncWrapper(userController.deleteUserById(req));
+
+  if (error) return next(error);
+  res.sendStatus(204);
+});
 
 module.exports = router;

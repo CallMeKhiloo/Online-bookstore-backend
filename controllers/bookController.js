@@ -1,7 +1,17 @@
 const Book = require('../models/bookModel');
+const customError = require('../helpers/customError');
 
 const getAllBooks = async (req) => {
-  const { category, author, minPrice, maxPrice, search, sort = '-createdAt', page = 1, limit = 20 } = req.query;
+  const {
+    category,
+    author,
+    minPrice,
+    maxPrice,
+    search,
+    sort = '-createdAt',
+    page = 1,
+    limit = 20,
+  } = req.query;
   const filter = {};
   if (category) filter.category = category;
   if (author) filter.author = author;
@@ -34,20 +44,25 @@ const createBook = async (req) => {
 };
 
 const getBook = async (req) => {
-  const book = await Book.findById(req.params.id).populate('author').populate('category');
-  if (!book) throw new Error('can not find book: id is not valid');
+  const book = await Book.findById(req.params.id)
+    .populate('author')
+    .populate('category');
+  if (!book) throw new customError('can not find book: id is not valid', 404);
   return book;
 };
 
 const updateBook = async (req) => {
-  const book = await Book.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-  if (!book) throw new Error('can not update book: id is not valid');
+  const book = await Book.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+  if (!book) throw new customError('can not update book: id is not valid', 404);
   return book;
-}
+};
 
 const deleteBook = async (req) => {
   const book = await Book.findByIdAndDelete(req.params.id);
-  if (!book) throw new Error('can not delete book: id is not valid');
+  if (!book) throw new customError('can not delete book: id is not valid', 404);
   return book;
 }
 

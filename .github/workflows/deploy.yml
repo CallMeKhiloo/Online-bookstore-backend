@@ -22,4 +22,4 @@ jobs:
             cd /home/ubuntu/Online-bookstore-backend/
             git pull origin main
             npm i
-            pm2 restart all
+            /home/ubuntu/.nvm/versions/node/v24.14.0/bin/pm2 restart all

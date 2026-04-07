@@ -7,10 +7,10 @@ const swaggerSpec = require('./config/swagger');
 const cors = require('cors');
 const { requestLogger } = require('./middlewares/logger');
 
+dotenv.config({ path: path.join(__dirname, '.env') });
 const router = require('./routes');
 const globalErrorHandler = require('./middlewares/errorHandler');
 
-dotenv.config({ path: path.join(__dirname, '.env') });
 require('./config/cloudinary');
 
 const database = process.env.DATABASE_URI;

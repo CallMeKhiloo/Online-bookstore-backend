@@ -686,3 +686,5 @@
 {"level":"info","message":"\u001b[0mGET /users \u001b[32m200\u001b[0m 99.281 ms - 3127\u001b[0m","timestamp":"2026-02-28T17:12:55.592Z"}
 {"level":"info","message":"\u001b[0mPATCH /users/69a3221748b0b6856326e1e0 \u001b[32m200\u001b[0m 109.055 ms - 361\u001b[0m","timestamp":"2026-02-28T17:13:22.138Z"}
 {"level":"info","message":"\u001b[0mGET /users \u001b[32m200\u001b[0m 107.515 ms - 3129\u001b[0m","timestamp":"2026-02-28T17:13:22.268Z"}
+{"level":"info","message":"\u001b[0mGET /order/can-review/69d48db054780d6e6c6a8d65 \u001b[33m404\u001b[0m 3.843 ms - 54\u001b[0m","timestamp":"2026-04-07T07:32:44.592Z"}
+{"level":"info","message":"\u001b[0mGET /order/can-review/69d48db054780d6e6c6a8d29 \u001b[33m404\u001b[0m 0.804 ms - 54\u001b[0m","timestamp":"2026-04-07T07:39:25.538Z"}

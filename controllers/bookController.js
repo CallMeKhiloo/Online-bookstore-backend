@@ -28,13 +28,14 @@ const getAllBooks = async (req) => {
     else sortObj[f] = 1;
   });
 
+  const totalBooks = await Book.countDocuments(filter);
   const books = await Book.find(filter)
     .populate('author')
     .populate('category')
     .sort(sortObj)
     .skip((page - 1) * limit)
     .limit(Number(limit));
-  return books;
+  return { books, totalBooks };
 };
 
 const createBook = async (req) => {
@@ -64,7 +65,7 @@ const deleteBook = async (req) => {
   const book = await Book.findByIdAndDelete(req.params.id);
   if (!book) throw new customError('can not delete book: id is not valid', 404);
   return book;
-}
+};
 
 const getLatestBooks = async (req) => {
   const books = await Book.find()
@@ -75,12 +76,11 @@ const getLatestBooks = async (req) => {
   return books;
 };
 
-
 module.exports = {
   getAllBooks,
   createBook,
   getBook,
   updateBook,
   deleteBook,
-  getLatestBooks
+  getLatestBooks,
 };
